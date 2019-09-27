@@ -19,8 +19,6 @@ const schema = new Schema({
   */
   authenticator: String,
   accessToken: String,
-  // if signing in with software server
-  password: String,  
   // my variables they set on first sign in
   firstName: String,
   lastName: String,
