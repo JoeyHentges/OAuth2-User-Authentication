@@ -7,7 +7,7 @@ let addLogs;
 
 router.post('/update-logs', checkKey, async (req, res) => addLogs(req.body, res));
 
-// Update the logs for a Company, Admin or User
+// Update the logs for a User
 addLogs = async (body, res) => {
   await updateLogs(
     body.id, body.type, body.messageNumber, body.logValue

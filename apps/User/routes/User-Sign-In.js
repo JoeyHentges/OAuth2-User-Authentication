@@ -1,4 +1,3 @@
-const bcrypt = require('bcrypt');
 const { graphql } = require('graphql');
 const express = require('express');
 const { checkKey } = require('../../tools');
