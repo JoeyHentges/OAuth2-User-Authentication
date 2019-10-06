@@ -68,4 +68,4 @@ handleArrayDelete = async (body) => {
   } = body;
   await User.findByIdAndUpdate(id,
     { $pull: { [array]: { [arrayIdentifier]: identifier } } }, { safe: true });
-}
+};

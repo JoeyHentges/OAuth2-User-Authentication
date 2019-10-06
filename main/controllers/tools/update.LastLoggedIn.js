@@ -3,7 +3,7 @@
  * Joseph Hentges
  * September 2019
  * https://joeyhentges.com
- * 
+ *
  * This function handles updaging the usner's last time logged in.
  * Used in the /apps/user/routes/User-Sign-In.js route
  */

@@ -45,6 +45,6 @@ getUser = async username => graphql(userTypedefs,
   userResolvers.Query).then(response => response.data.getUserByUsername);
 
 // delete the user by its id
-deleteUser = async id => userResolvers.Mutation.deleteUser({id});
+deleteUser = async id => userResolvers.Mutation.deleteUser({ id });
 
 module.exports.routes = router;
