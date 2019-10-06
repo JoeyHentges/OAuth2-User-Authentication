@@ -10,12 +10,10 @@
 
 // Other Helper Fuctions
 const { updateLogs } = require('./routes/Update-Logs');
-const { updateLastLogged } = require('./routes/Update-Last-Logged-In');
 
 // the helper functions / items to be exported
 const contents = {
-  updateLogs,
-  updateLastLogged
+  updateLogs
 };
 
 // export the contents
