@@ -19,7 +19,6 @@ const schema = new Schema({
   username: String,
   email: String,
   // some account checking variables
-  locked: Boolean,
   disabled: Boolean,
   accountVerified: Boolean,
   // dates
