@@ -4,27 +4,25 @@ const defs = `
     scalar Date
     scalar JSON
 
+    scalar LOGS {
+        time: Date
+        message: String
+    }
+
     type User {
         id: ID
-        locked: Boolean
-        disabled: Boolean
-        accountVerified: Boolean
+        accessToken: String
         email: String
-        password: String
         username: String
         firstName: String
         lastName: String
+        locked: Boolean
+        disabled: Boolean
+        accountVerified: Boolean
         dateCreated: Date
         dateModified: Date
         dateLastLoggedIn: Date
-        securityQuestions: JSON
-        logs: [JSON]
-    }
-
-    scalar Permission {
-        title: String
-        type: String
-        description: String
+        logs: [LOGS]
     }
 
     type Query {
