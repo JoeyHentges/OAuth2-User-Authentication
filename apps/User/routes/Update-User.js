@@ -12,6 +12,8 @@ let updateUser;
 router.post('/update', checkKey, upload.single('file'), async (req, res) => updateUser(req.body, req.file, res));
 
 // update an User value
+let handleArray;
+let handleArrayDelete;
 updateUser = async (body, file, res) => {
   // parameters
   const {
@@ -68,4 +70,4 @@ handleArrayDelete = async (body) => {
   } = body;
   await User.findByIdAndUpdate(id,
     { $pull: { [array]: { [arrayIdentifier]: identifier } } }, { safe: true });
-}
+};
