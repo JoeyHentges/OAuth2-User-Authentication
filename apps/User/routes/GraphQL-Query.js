@@ -8,7 +8,7 @@ const router = express.Router();
 
 let graphQL;
 
-router.post('/g', checkKey, async (req, res) => graphQL(req.body, res));
+router.post('/', checkKey, async (req, res) => graphQL(req.body, res));
 
 // Get the User by its ID
 graphQL = async (body, res) => {

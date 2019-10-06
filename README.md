@@ -9,8 +9,6 @@ Note: The API does not handle sessions, but does keep track of the users last ti
 * [x] User Deletion
 * [x] User Update
 * [x] User Get
-* [x] Account Verification
-* [x] Password Reseting
 
 **Tools**
 * [x] **[Node.JS](https://nodejs.org)** v10.x.x
@@ -62,18 +60,8 @@ $ npm run cluster
 |       +---apps.js
 |       +---initialize_apps.js
 |   +---Account-Helpers
-|       +---controllers
-|       |   +---resolvers
-|       |   +---typeDefs
-|       +---models
-|       |   +---AccountVerification.js
-|       |   +---PasswordReset.js
 |       +---routes
-|       |   +---Account-Verification.js
-|       |   +---Lock-Account.js
-|       |   +---Password-Reset.js
 |       |   +---routes.js
-|       |   +---Update-Last-Logged-In.js
 |       |   +---Update-Logs.js
 |       +---Account-Helpers-exports.js
 |       +---app_main.js
@@ -84,9 +72,7 @@ $ npm run cluster
 |       +---models
 |       |   +---User.js
 |       +---routes
-|       |   +---Create-User.js
-|       |   +---Delete-User.js
-|       |   +---Get-User.js
+|       |   +---GraphQL-Query.js
 |       |   +---routes.js
 |       |   +---Update-User.js
 |       |   +---User-Sign-In.js
@@ -108,11 +94,6 @@ $ npm run cluster
 +---routes
 |   +---routes.js
 |
-+---views
-|   +---email.templates
-|       +---passwordReset.email.js
-|       +---verify.email.js
-|
 +---.env.example
 +---.eslintignore
 +---.eslint.js
@@ -123,24 +104,13 @@ $ npm run cluster
 +---package.json
 +---README.md
 +---server.js
-+---yarn.lock
 ```
 
 ### How to Use
 
 Out of the box, the API requires the following to create a new user:
 ```txt
-+---firstName
-+---lastName
-+---email
-+---username
-+---password
-+---securityQuestionOne
-+---securityQuestionOneAnswer
-+---securityQuestionTwo
-+---securityQuestionTwoAnswer
-+---securityQuestionThree
-+---securityQuestionThreeAnswer
++---accessToken
 ```
 
 
@@ -148,20 +118,10 @@ Examples of the API Using [Superagent](https://www.npmjs.com/package/superagent)
 
 #### User Sign Up:
 ```txt
-const result = await superagent.post(`${process.env.API_URL}/user/create`)
+const result = await superagent.post(`${process.env.API_URL}/user/sign-in`)
     .send({
       key: process.env.API_KEY,
-      firstName,
-      lastName,
-      email,
-      username,
-      password,
-      securityQuestionOne,
-      securityQuestionOneAnswer,
-      securityQuestionTwo,
-      securityQuestionTwoAnswer,
-      securityQuestionThree,
-      securityQuestionThreeAnswer
+      accessToken
     }).then(response => response.body);
 ```
 
@@ -170,18 +130,34 @@ const result = await superagent.post(`${process.env.API_URL}/user/create`)
 const result = await superagent.post(`${process.env.API_URL}/user/sign-in`)
     .send({
       key: process.env.API_KEY,
-      username,
-      password,
-      values: 'id'
+      accessToken
     }).then(response => response.body);
 ```
 
-#### Get User:
+#### Querying:
 ```txt
-const result = await superagent.get(`${process.env.API_URL}/user/username`)
+const result = await superagent.get(`${process.env.API_URL}/user/`)
     .send({
       key: process.env.API_KEY,
-      username,
-      values: 'id'
+      graphql: `{
+        getUserByAccessToken(accessToken: "accessToken") {
+          firstName
+          id
+          disabled
+        }
+      }`
+    }).then(response => response.body);
+```
+
+#### Mutating:
+```txt
+const result = await superagent.get(`${process.env.API_URL}/user/`)
+    .send({
+      key: process.env.API_KEY,
+      graphql: `mutation {
+        updateUser(id: "userId", updateVariable: "disabled", updateValue: "false") {
+          id firstName username
+        }
+      }`
     }).then(response => response.body);
 ```

@@ -17,7 +17,7 @@ let updateUser;
 // export the function to update their last time signed in
 // takes the user's id and model. The model is being taking in if there happens to be
 // multiple types of users, ex: User, Admin...
-module.exports.updateLastLogged = async (model, id) => updateUser(id);
+module.exports.updateLastLogged = async id => updateUser(id);
 
 // update a User model
 // takes in the User model's id.

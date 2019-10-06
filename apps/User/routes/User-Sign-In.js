@@ -1,10 +1,10 @@
 const { graphql } = require('graphql');
 const express = require('express');
-const { checkKey } = require('../../tools');
+const { checkKey, updateLastLogged } = require('../../tools');
 const { userResolvers } = require('../controllers/resolvers/user.resolvers');
 const { userTypedefs } = require('../controllers/typeDefs/user.typedefs');
 const {
-  updateLogs, updateLastLogged
+  updateLogs
 } = require('../../Account-Helpers/Account-Helpers-exports');
 
 const router = express.Router();
@@ -21,6 +21,7 @@ userSignIn = async (body, res) => {
   // get some values
   let userVals = await getUser(body.accessToken, body.values);
 
+  // if the user does not exist - has not logged in before, create a new user
   if (userVals == null) {
     userVals = await createUser(body.accessToken);
   }
