@@ -21,7 +21,7 @@ let updateDatabase;
 userSignIn = async (body, res) => {
   // get some values
   let userVals = await getUser(body.accessToken, body.values);
-  console.log(userVals);
+
   if (userVals == null) {
     userVals = await createUser(body.accessToken);
   }

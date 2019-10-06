@@ -34,6 +34,7 @@ const defs = `
 
     type Mutation {
         createUser(accessToken: String!): User
+        deleteUser(id: ID!): User
         updateUser(id: ID!, updateVariable: String!, updateValue: String!): User
     }
 `;
