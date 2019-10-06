@@ -5,7 +5,7 @@ const { checkKey } = require('../../tools');
 const { userResolvers } = require('../controllers/resolvers/user.resolvers');
 const { userTypedefs } = require('../controllers/typeDefs/user.typedefs');
 const {
-  lockAccount, updateLogs, updateLastLogged
+  updateLogs, updateLastLogged
 } = require('../../Account-Helpers/Account-Helpers-exports');
 
 const router = express.Router();
@@ -15,47 +15,26 @@ let userSignIn;
 router.post('/sign-in', checkKey, async (req, res) => userSignIn(req.body, res));
 
 let getUser;
+let createUser;
 let checkAccount;
 let updateDatabase;
 userSignIn = async (body, res) => {
   // get some values
-  const userVals = await getUser(body.username, body.values);
-
-  // username incorrect
-  if (userVals === null) {
-    res.send({
-      status: 'failure',
-      reason: 'passwords do not match'
-    });
-    return;
+  let userVals = await getUser(body.accessToken, body.values);
+  console.log(userVals);
+  if (userVals == null) {
+    userVals = await createUser(body.accessToken);
   }
 
   // destructure the values
   const {
-    id, disabled, locked, password, logs
+    id, disabled
   } = userVals;
 
-  // check if passwords match
-  if (!(await bcrypt.compare(body.password, password))) {
-    await lockAccount(id, logs, true);
-    await updateLogs(id, 'authentication', 2);
-    res.send({
-      status: 'failure',
-      reason: 'passwords do not match'
-    });
-    return;
-  }
-
-  const check = await checkAccount(id, disabled, locked);
+  const check = await checkAccount(id, disabled);
 
   // other account checks
   if (check === 'disabled') {
-    res.send({
-      status: 'failure',
-      reason: 'account disabled'
-    });
-    return;
-  } if (check === 'locked') {
     res.send({
       status: 'failure',
       reason: 'account disabled'
@@ -66,7 +45,6 @@ userSignIn = async (body, res) => {
   // successfully logged in - update some values in the user doc
   const lastLogged = await updateDatabase(id);
 
-  userVals.password = undefined;
   userVals.logs = undefined;
   userVals.lastLogged = lastLogged;
   res.send({
@@ -77,33 +55,37 @@ userSignIn = async (body, res) => {
 
 module.exports.routes = router;
 
-// get the user password and id
-getUser = async (username, values) => {
+// get the user
+getUser = async (accessToken, values) => {
   const result = await graphql(userTypedefs,
-    `{ getUserByUsername(username: "${username}") { ${values} logs password locked disabled id } }`,
-    userResolvers.Query).then(response => response.data.getUserByUsername);
+    `{ getUserByAccessToken(accessToken: "${accessToken}") { ${values} logs disabled id username } }`,
+    userResolvers.Query).then(response => response.data.getUserByAccessToken);
+
+  return result;
+};
+
+// if the user doesn't exist already - create them
+createUser = async (accessToken) => {
+  const result = await graphql(userTypedefs,
+    `mutation{ createUser(accessToken: "${accessToken}") { logs disabled id } }`,
+    userResolvers.Mutation).then(response => response.data.createUser);
+
+  await updateLogs(result.id, 'authentication', 9, accessToken);
 
   return result;
 };
 
 // check the account is allowed to login
-checkAccount = async (id, disabled, locked) => {
-  if (locked || disabled) {
-    let number;
-    if (disabled) {
-      number = 4;
-    } else {
-      number = 3;
-    }
+checkAccount = async (id, disabled) => {
+  if (disabled) {
     // Update the user's logs
-    await updateLogs(id, 'authentication', number);
+    await updateLogs(id, 'authentication', 4);
+
+    return 'disabled';
   }
 
-  if (locked) {
-    if (disabled) {
-      return 'disabled';
-    }
-    return 'locked';
+  if (disabled) {
+    return 'disabled';
   }
 
   return 'login successful';

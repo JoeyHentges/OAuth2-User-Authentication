@@ -5,46 +5,20 @@ const getUsers = () => User.find();
 
 const getUserById = id => User.findById(id);
 
+const getUserByAccessToken = accessToken => User.findOne({ accessToken: new RegExp(`^${accessToken}$`, 'i') });
+
 const getUserByUsername = username => User.findOne({ username: new RegExp(`^${username}$`, 'i') });
 
 const getUserByEmail = email => User.findOne({ email: new RegExp(`^${email}$`, 'i') });
 
-const createUser = async (
-  firstName, lastName, email, username, password,
-  securityQuestionOne, securityQuestionOneAnswer,
-  securityQuestionTwo, securityQuestionTwoAnswer,
-  securityQuestionThree, securityQuestionThreeAnswer
-) => {
-  // Hash the new password
-  const hashedPassword = await bcrypt
-    .hash(password, 10)
-    .then(hash => hash);
+const createUser = async (accessToken) => {
   const date = new Date();
   const user = new User({
-    locked: false,
+    accessToken,
     disabled: false,
     accountVerified: false,
-    email,
-    username,
-    firstName,
-    lastName,
-    password: hashedPassword,
     dateCreated: date,
     dateModified: date,
-    securityQuestions: {
-      questionOne: {
-        question: securityQuestionOne,
-        answer: securityQuestionOneAnswer,
-      },
-      questionTwo: {
-        question: securityQuestionTwo,
-        answer: securityQuestionTwoAnswer,
-      },
-      questionThree: {
-        question: securityQuestionThree,
-        answer: securityQuestionThreeAnswer,
-      },
-    },
   });
   await user.save();
   return user;
@@ -72,21 +46,12 @@ const userResolvers = {
   Query: {
     getUsers: () => getUsers(),
     getUserById: ({ id }) => getUserById(id),
+    getUserByAccessToken: ({ accessToken }) => getUserByAccessToken(accessToken),
     getUserByUsername: ({ username }) => getUserByUsername(username),
     getUserByEmail: ({ email }) => getUserByEmail(email)
   },
   Mutation: {
-    createUser: async ({
-      firstName, lastName, email, username, password,
-      securityQuestionOne, securityQuestionOneAnswer,
-      securityQuestionTwo, securityQuestionTwoAnswer,
-      securityQuestionThree, securityQuestionThreeAnswer
-    }) => createUser(
-      firstName, lastName, email, username, password,
-      securityQuestionOne, securityQuestionOneAnswer,
-      securityQuestionTwo, securityQuestionTwoAnswer,
-      securityQuestionThree, securityQuestionThreeAnswer
-    ),
+    createUser: async ({ accessToken }) => createUser(accessToken),
     deleteUser: async ({ id }) => deleteUser(id),
     updateUser: async ({
       id, updateVariable, updateValue

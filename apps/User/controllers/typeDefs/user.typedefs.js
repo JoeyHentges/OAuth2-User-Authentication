@@ -16,7 +16,6 @@ const defs = `
         username: String
         firstName: String
         lastName: String
-        locked: Boolean
         disabled: Boolean
         accountVerified: Boolean
         dateCreated: Date
@@ -28,11 +27,13 @@ const defs = `
     type Query {
         getUsers: [User!]!
         getUserById(id: ID!): User
+        getUserByAccessToken(accessToken: String!): User
         getUserByUsername(username: String!): User
         getUserByEmail(email: String!): User
     }
 
     type Mutation {
+        createUser(accessToken: String!): User
         updateUser(id: ID!, updateVariable: String!, updateValue: String!): User
     }
 `;

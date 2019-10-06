@@ -27,7 +27,7 @@ updateUser = async (id) => {
   // run a mongoose request to updare by id
   // set their dateLastLoggedIn to the new date
   // return their last time logged in
-  let lastLogged = await User.findByIdAndUpdate(id,
+  const lastLogged = await User.findByIdAndUpdate(id,
     { $set: { dateLastLoggedIn: newDate } },
     { new: false })
     .then(result => result);
